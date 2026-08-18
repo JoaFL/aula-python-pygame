@@ -1,9 +1,72 @@
 import pygame
+import random
 
-LARGURA = 800
-ALTURA = 450
+LARGURA = 1200
+ALTURA = 600
+
 AZUL_ESCURO = (20, 35, 70)
+ROXO = (160, 32, 240)
+VEREMELHO = (255, 0, 0)
+VERDE = (0, 255, 0)
+AMARELO = (255, 255, 0)
+CIANO = (0, 255, 255)
 BRANCO = (255, 255, 255)
+COR_ALEATORIA = (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
+
+def quadrado():
+    pygame.draw.circle(tela, VEREMELHO, (100, 100), 10)
+    pygame.draw.circle(tela, VEREMELHO, (150, 100), 10)
+    pygame.draw.circle(tela, VEREMELHO, (200, 100), 10)
+    pygame.draw.circle(tela, VEREMELHO, (250, 100), 10)
+    pygame.draw.circle(tela, VEREMELHO, (300, 100), 10)
+    
+    pygame.draw.circle(tela, VEREMELHO, (100, 150), 10)
+    pygame.draw.circle(tela, VEREMELHO, (100, 200), 10)
+    pygame.draw.circle(tela, VEREMELHO, (100, 250), 10)
+    pygame.draw.circle(tela, VEREMELHO, (100, 300), 10)
+    
+    pygame.draw.circle(tela, VEREMELHO, (300, 150), 10)
+    pygame.draw.circle(tela, VEREMELHO, (300, 200), 10)
+    pygame.draw.circle(tela, VEREMELHO, (300, 250), 10)
+    pygame.draw.circle(tela, VEREMELHO, (300, 250), 10)
+    
+    pygame.draw.circle(tela, VEREMELHO, (100, 300), 10)
+    pygame.draw.circle(tela, VEREMELHO, (150, 300), 10)
+    pygame.draw.circle(tela, VEREMELHO, (200, 300), 10)
+    pygame.draw.circle(tela, VEREMELHO, (250, 300), 10)
+    pygame.draw.circle(tela, VEREMELHO, (300, 300), 10)
+
+
+def losangulo():
+    pygame.draw.circle(tela, VERDE, (650, 100), 10)
+    pygame.draw.circle(tela, VERDE, (600, 150), 10)
+    pygame.draw.circle(tela, VERDE, (550, 200), 10)
+    pygame.draw.circle(tela, VERDE, (500, 250), 10)
+    
+    pygame.draw.circle(tela, VERDE, (650, 100), 10)
+    pygame.draw.circle(tela, VERDE, (700, 150), 10)
+    pygame.draw.circle(tela, VERDE, (750, 200), 10)
+    pygame.draw.circle(tela, VERDE, (800, 250), 10)
+    
+    pygame.draw.circle(tela, VERDE, (650, 400), 10)
+    pygame.draw.circle(tela, VERDE, (600, 350), 10)
+    pygame.draw.circle(tela, VERDE, (550, 300), 10)
+    pygame.draw.circle(tela, VERDE, (500, 250), 10)
+        
+    pygame.draw.circle(tela, VERDE, (650, 400), 10)
+    pygame.draw.circle(tela, VERDE, (700, 350), 10)
+    pygame.draw.circle(tela, VERDE, (750, 300), 10)
+    pygame.draw.circle(tela, VERDE, (800, 250), 10)
+    
+def circulo():
+    pygame.draw.circle(tela, AMARELO, (900 , 370), 5)
+    pygame.draw.circle(tela, AMARELO, (920 , 340), 5)
+    pygame.draw.circle(tela, AMARELO, (940 , 330), 5)
+    pygame.draw.circle(tela, AMARELO, (960 , 280), 5)
+    
+    # pygame.draw.circle(tela, AMARELO, (940 , 350), 5)
+    # pygame.draw.circle(tela, AMARELO, (920 , 350), 5)
+    # pygame.draw.circle(tela, AMARELO, (900 , 350), 5)
 
 pygame.init()
 tela = pygame.display.set_mode((LARGURA, ALTURA))
@@ -17,8 +80,29 @@ while rodando:
             
     tela.fill(AZUL_ESCURO)
     
-    pygame.draw.circle(tela, BRANCO, (0, 0), 8)
-    pygame.draw.circle(tela, BRANCO, (LARGURA // 2, ALTURA // 2), 8)
+    pygame.draw.circle(tela, VEREMELHO, (0, 0), 10)
+    pygame.draw.circle(tela, VEREMELHO, (LARGURA // 2, ALTURA // 2), 8)
+    
+    quadrado()
+    losangulo()
+    circulo()
+    
+    pygame.draw.circle(tela, COR_ALEATORIA, (100, 100), 10)
+    pygame.draw.circle(tela, COR_ALEATORIA, (100, 100), 10)
+    pygame.draw.circle(tela, COR_ALEATORIA, (100, 100), 10)
+    pygame.draw.circle(tela, COR_ALEATORIA, (100, 100), 10)
+    
+    pygame.draw.circle(tela, COR_ALEATORIA, (100, 100), 10)
+    pygame.draw.circle(tela, COR_ALEATORIA, (100, 100), 10)
+    pygame.draw.circle(tela, COR_ALEATORIA, (100, 100), 10)
+    pygame.draw.circle(tela, COR_ALEATORIA, (100, 100), 10)
+    
+    pygame.draw.circle(tela, COR_ALEATORIA, (100, 100), 10)
+    pygame.draw.circle(tela, COR_ALEATORIA, (100, 100), 10)
+    pygame.draw.circle(tela, COR_ALEATORIA, (100, 100), 10)
+    pygame.draw.circle(tela, COR_ALEATORIA, (100, 100), 10)
+    
+
     pygame.display.flip()
 
 pygame.quit()
