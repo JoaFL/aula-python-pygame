@@ -1,5 +1,6 @@
 import pygame
 import random
+import math
 
 LARGURA = 1200
 ALTURA = 600
@@ -23,11 +24,9 @@ def quadrado():
     pygame.draw.circle(tela, VEREMELHO, (100, 150), 10)
     pygame.draw.circle(tela, VEREMELHO, (100, 200), 10)
     pygame.draw.circle(tela, VEREMELHO, (100, 250), 10)
-    pygame.draw.circle(tela, VEREMELHO, (100, 300), 10)
     
     pygame.draw.circle(tela, VEREMELHO, (300, 150), 10)
     pygame.draw.circle(tela, VEREMELHO, (300, 200), 10)
-    pygame.draw.circle(tela, VEREMELHO, (300, 250), 10)
     pygame.draw.circle(tela, VEREMELHO, (300, 250), 10)
     
     pygame.draw.circle(tela, VEREMELHO, (100, 300), 10)
@@ -43,15 +42,12 @@ def losangulo():
     pygame.draw.circle(tela, VERDE, (550, 200), 10)
     pygame.draw.circle(tela, VERDE, (500, 250), 10)
     
-    pygame.draw.circle(tela, VERDE, (650, 100), 10)
     pygame.draw.circle(tela, VERDE, (700, 150), 10)
     pygame.draw.circle(tela, VERDE, (750, 200), 10)
-    pygame.draw.circle(tela, VERDE, (800, 250), 10)
     
-    pygame.draw.circle(tela, VERDE, (650, 400), 10)
     pygame.draw.circle(tela, VERDE, (600, 350), 10)
     pygame.draw.circle(tela, VERDE, (550, 300), 10)
-    pygame.draw.circle(tela, VERDE, (500, 250), 10)
+    
         
     pygame.draw.circle(tela, VERDE, (650, 400), 10)
     pygame.draw.circle(tela, VERDE, (700, 350), 10)
@@ -59,14 +55,17 @@ def losangulo():
     pygame.draw.circle(tela, VERDE, (800, 250), 10)
     
 def circulo():
-    pygame.draw.circle(tela, AMARELO, (900 , 370), 5)
-    pygame.draw.circle(tela, AMARELO, (920 , 340), 5)
-    pygame.draw.circle(tela, AMARELO, (940 , 330), 5)
-    pygame.draw.circle(tela, AMARELO, (960 , 280), 5)
-    
-    # pygame.draw.circle(tela, AMARELO, (940 , 350), 5)
-    # pygame.draw.circle(tela, AMARELO, (920 , 350), 5)
-    # pygame.draw.circle(tela, AMARELO, (900 , 350), 5)
+    # tive que usar matemática
+
+    posX = 1000
+    posY = 300
+
+    for i in range(10):
+       angulo = (i / 10) * math.pi * 2
+       x = posX + math.cos(angulo) * 100
+       y = posY + math.sin(angulo) * 100
+
+       pygame.draw.circle(tela, AMARELO, (x, y), 10)
 
 pygame.init()
 tela = pygame.display.set_mode((LARGURA, ALTURA))
@@ -86,22 +85,6 @@ while rodando:
     quadrado()
     losangulo()
     circulo()
-    
-    pygame.draw.circle(tela, COR_ALEATORIA, (100, 100), 10)
-    pygame.draw.circle(tela, COR_ALEATORIA, (100, 100), 10)
-    pygame.draw.circle(tela, COR_ALEATORIA, (100, 100), 10)
-    pygame.draw.circle(tela, COR_ALEATORIA, (100, 100), 10)
-    
-    pygame.draw.circle(tela, COR_ALEATORIA, (100, 100), 10)
-    pygame.draw.circle(tela, COR_ALEATORIA, (100, 100), 10)
-    pygame.draw.circle(tela, COR_ALEATORIA, (100, 100), 10)
-    pygame.draw.circle(tela, COR_ALEATORIA, (100, 100), 10)
-    
-    pygame.draw.circle(tela, COR_ALEATORIA, (100, 100), 10)
-    pygame.draw.circle(tela, COR_ALEATORIA, (100, 100), 10)
-    pygame.draw.circle(tela, COR_ALEATORIA, (100, 100), 10)
-    pygame.draw.circle(tela, COR_ALEATORIA, (100, 100), 10)
-    
 
     pygame.display.flip()
 
