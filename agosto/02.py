@@ -56,7 +56,6 @@ def losangulo():
     
 def circulo():
     # tive que usar matemática
-
     posX = 1000
     posY = 300
 
