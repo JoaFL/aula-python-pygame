@@ -2,10 +2,8 @@ import pygame
 import random
 import math
 
-# tela
 LARGURA = 1200
 ALTURA = 600
-# cores
 AZUL_ESCURO = (20, 35, 70)
 ROXO = (160, 32, 240)
 VERMELHO = (255, 0, 0)
