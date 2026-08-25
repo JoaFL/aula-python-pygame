@@ -57,9 +57,10 @@ def circulo():
     # tive que usar matemática
     posX = 1000
     posY = 300
+    circulos = 30
 
-    for i in range(10):
-       angulo = (i / 10) * math.pi * 2
+    for i in range(circulos):
+       angulo = (i / circulos) * math.pi * 2
        x = posX + math.cos(angulo) * 100
        y = posY + math.sin(angulo) * 100
 
