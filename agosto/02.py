@@ -34,7 +34,6 @@ def quadrado():
     pygame.draw.circle(tela, VERMELHO, (250, 300), 10)
     pygame.draw.circle(tela, VERMELHO, (300, 300), 10)
 
-
 def losangulo():
     pygame.draw.circle(tela, VERDE, (650, 100), 10)
     pygame.draw.circle(tela, VERDE, (600, 150), 10)
