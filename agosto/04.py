@@ -40,7 +40,6 @@ while rodando:
             if evento.key == pygame.K_c:
                 chuva = not chuva
             
-    
     if sol:
         pygame.draw.circle(tela, (255, 255, 0), (0, 0), 100)
         pygame.draw.circle(tela, (255, 165, 0), (0, 0), 110, 25)
@@ -62,14 +61,15 @@ while rodando:
             agua -= 0.001
             pygame.draw.line(tela, (0, 0, 255), (pos + curva, 0), (pos - curva, 400), 5)
     
+    
+    pontos = [(0, 330), (SW, 330), (SW, agua), (0, agua)] 
+    pygame.draw.polygon(tela, (0, 0, 255), pontos, 0)
+    
     pygame.draw.rect(tela, (60, 180, 90), (0, 330, 800, 120))
     pygame.draw.rect(tela, (70, 130, 255), (360, 260, 80, 60))
     pygame.draw.circle(tela, (255, 230, 200), (400, 245), 28)
     pygame.draw.line(tela, (20, 20, 20), (375, 245), (390, 245), 4)
     pygame.draw.line(tela, (20, 20, 20), (410, 245), (425, 245), 4)
-    
-    pontos = [(0, 330), (SW, 330), (SW, agua), (0, agua)] 
-    pygame.draw.polygon(tela, (0, 0, 255), pontos, 0)
     
     agua += 0.001
     

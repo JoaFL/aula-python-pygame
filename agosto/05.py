@@ -54,8 +54,24 @@ while rodando:
         
     tela.fill((25, 25, 40))
     
-    pygame.draw.rect(tela, quadrado["cor"], (quadrado["x"], quadrado["y"], quadrado["tamanho"], quadrado["tamanho"]))
-    pygame.draw.circle(tela, circulo["cor"], (circulo["x"], circulo["y"]), circulo["tamanho"])
+    pygame.draw.rect(
+        tela, 
+        quadrado["cor"],
+        (
+            quadrado["x"],
+            quadrado["y"],
+            quadrado["tamanho"],
+            quadrado["tamanho"]
+        )
+    )
+    pygame.draw.circle(
+        tela,
+        circulo["cor"],
+        (
+            circulo["x"],
+            circulo["y"]),
+            circulo["tamanho"]
+        )
     
     pygame.display.flip()
     
