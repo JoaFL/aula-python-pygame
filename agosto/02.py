@@ -52,16 +52,15 @@ def losangulo():
     pygame.draw.circle(tela, VERDE, (750, 300), 10)
     pygame.draw.circle(tela, VERDE, (800, 250), 10)
     
-def circulo():
+def circulo(num, radius):
     # tive que usar matemática
     posX = 1000
     posY = 300
-    circulos = 30
 
-    for i in range(circulos):
-       angulo = (i / circulos) * math.pi * 2
-       x = posX + math.cos(angulo) * 100
-       y = posY + math.sin(angulo) * 100
+    for i in range(num):
+       angulo = (i / num) * math.pi * 2
+       x = posX + math.cos(angulo) * radius
+       y = posY + math.sin(angulo) * radius
 
        pygame.draw.circle(tela, AMARELO, (x, y), 10)
 
@@ -82,7 +81,7 @@ while rodando:
     
     quadrado()
     losangulo()
-    circulo()
+    circulo(30, 300)
 
     pygame.display.flip()
 
