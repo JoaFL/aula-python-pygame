@@ -3,7 +3,7 @@ import pygame
 FPS = 60
 
 pygame.init()
-tela = pygame.display.set_mode((800, 450))
+tela = pygame.display.set_mode((800, 450)) 
 
 relogio = pygame.time.Clock()
 velocidade = 250
@@ -33,19 +33,15 @@ while rodando:
     if teclas[pygame.K_s] or teclas[pygame.K_DOWN]:
         jogador.y += velocidade * dt
 
-    # Impede o jogador de sair da tela
     jogador.clamp_ip(area_tela)
 
-    # Verifica se o jogador está encostando no obstáculo
     if obstaculo and jogador.colliderect(obstaculo):
         cor_jogador = (255, 90, 90)
         obstaculo = None
     else:
         cor_jogador = (70, 150, 255)
 
-    # Desenha a tela
     tela.fill((30, 30, 30))
-
     pygame.draw.rect(tela, cor_jogador, jogador)
 
     if obstaculo:
