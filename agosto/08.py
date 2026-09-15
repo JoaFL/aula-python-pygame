@@ -9,6 +9,8 @@ pygame.display.set_caption("Jogo do Alvo")
 rodando = True
 pontos = 0
 
+diminuir = 10
+aumentar = diminuir * 2
 alvo = pygame.Rect(300, 180, 60, 60)
 
 while rodando:
@@ -22,13 +24,21 @@ while rodando:
 
             if alvo.collidepoint(evento.pos):
                 pontos += 1
-
-                alvo.x = random.randint(0, 740)
-                alvo.y = random.randint(0, 390)
+                alvo.width -= diminuir
+                alvo.height -= diminuir
+            else:
+                alvo.width += aumentar
+                alvo.height += aumentar
+                
+            alvo.x = random.randint(0, 740)
+            alvo.y = random.randint(0, 390)
 
     tela.fill((30, 30, 30))
 
     pygame.draw.rect(tela, (255, 110, 90), alvo)
+    
+    if alvo.width <= 0:
+        rodando = False
 
     pygame.display.flip()
 
