@@ -9,13 +9,10 @@ pygame.init()
 
 LARGURA = 800
 ALTURA = 500
-
 FPS = 60
-
 COR_FUNDO = (10, 15, 35)
 COR_NAVE = (80, 220, 255)
 COR_NAVE2 = (255, 80, 80)
-
 VELOCIDADE_NAVE = 6
 
 # -----------------------------
