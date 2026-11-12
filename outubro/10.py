@@ -4,6 +4,7 @@
 import pygame
 
 pygame.init()
+
 # 1. CONFIGURACOES
 LARGURA, ALTURA = 800, 500
 FPS = 60
@@ -64,7 +65,7 @@ ARTE = [
     "000110000011000",
     "000110000011000",
     "001110000011100",
-    "001100000001100",
+    "001110000011100",
 ]
 
 # 9. PREPARAR A JANELA E OBJETOS
@@ -75,10 +76,12 @@ fonte = pygame.font.Font(None, 30)
 fonte_grande = pygame.font.Font(None, 55)
 nave = pygame.Rect(380, 425, 40, 40)
 tiros = []
+
 # 10. LOOP PRINCIPAL
 rodando = True
 while rodando:
     relogio.tick(FPS)
+    
     # EVENTOS: so aqui lemos KEYDOWN
     for evento in pygame.event.get():
         if evento.type == pygame.QUIT:
@@ -107,6 +110,7 @@ while rodando:
         (nave.left, nave.bottom),
         (nave.right, nave.bottom)
     ])
+    
     # Nesta aula desenhamos diretamente os quadradinhos (preview).
     for linha, texto in enumerate(DESENHO_1):
         for coluna, simbolo in enumerate(texto):
@@ -127,8 +131,10 @@ while rodando:
                 pygame.draw.rect(tela, cor, (
                     100 + coluna * 3, 90 + linha * 3, 3, 3
                 ))
+                
     for tiro in tiros:
         pygame.draw.rect(tela, COR_TIRO, tiro)
+        
     mensagem = ""
     if nave.left == 0:
         mensagem = "Limite esquerdo!"
@@ -137,5 +143,7 @@ while rodando:
     if mensagem:
         texto = fonte.render(mensagem, True, COR_TEXTO)
         tela.blit(texto, (20, 465))
+        
     pygame.display.flip()
+    
 pygame.quit()
