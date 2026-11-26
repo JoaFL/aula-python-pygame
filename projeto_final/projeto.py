@@ -177,15 +177,15 @@ nave, tiros, inimigos, pontos, vidas, onda, direcao, resto_x = nova_partida()
 sprites = [gerar_sprite(DESENHO_1, ROXO), gerar_sprite(DESENHO_2, ROXO)]
 estado = "menu"  # menu, jogando, pausado, registrar, fim
 som_tiro = carregar_som("tiro.wav", 0.25)
-som_acerto = carregar_som("acerto.wav", 0.55)
-som_dano = carregar_som("dano.wav", 0.55)
+som_acerto = carregar_som("acerto.wav", 0.15)
+som_dano = carregar_som("dano.wav", 1)
 som_fim = carregar_som("fim.wav", 0.55)
 musica_pronta = False
 musica_ligada = True
 if pygame.mixer.get_init():
     try:
         pygame.mixer.music.load(str(PASTA_SONS / "musica.wav"))
-        pygame.mixer.music.set_volume(0.18)
+        pygame.mixer.music.set_volume(0.25)
         pygame.mixer.music.play(-1)
         musica_pronta = True
     except (pygame.error, FileNotFoundError):
