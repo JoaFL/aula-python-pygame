@@ -1,0 +1,360 @@
+# SPACESHIPS - AULA 40
+# Versao cumulativa: inclui tudo o que foi trabalhado ate esta aula.
+# Execute: python aula_40.py
+# CHECKLIST: zigue-zague, animacao, tiros, vidas, musica, Top 5 e persistencia
+from pathlib import Path
+import sqlite3
+import pygame
+
+pygame.init()
+PASTA = Path(__file__).resolve().parent
+PASTA_SONS = PASTA / "sons"
+ARQUIVO_BANCO = PASTA / "recordes.db"
+# 1. CONFIGURACOES
+LARGURA, ALTURA = 800, 500
+FPS = 60
+COR_FUNDO = (10, 15, 35)
+COR_NAVE = (80, 220, 255)
+COR_TEXTO = (255, 255, 255)
+COR_TIRO = (255, 230, 100)
+VELOCIDADE_NAVE = 6
+ROXO = (188, 100, 247)
+VERDE = (105, 250, 206)
+TAMANHO_PIXEL = 3
+LARGURA_ALIEN, ALTURA_ALIEN = 39, 33
+COLUNAS, LINHAS = 8, 3
+ESPACO_X, ESPACO_Y = 23, 17
+MARGEM, DESCIDA = 18, 29
+MAX_NOME = 16
+
+# 2. MATRIZ DE PIXEL ART (0=vazio, 1=corpo, 2=olhos)
+DESENHO_1 = [
+    "0001100011000",
+    "0011111111100",
+    "0111111111110",
+    "1122111112211",
+    "1111111111111",
+    "1111111111111",
+    "0011111111100",
+    "0011011101100",
+    "0110000000110",
+    "1100000000011",
+    "1000000000001",
+]
+DESENHO_2 = [
+    "0001100011000",
+    "0011111111100",
+    "0111111111110",
+    "1122111112211",
+    "1111111111111",
+    "1111111111111",
+    "0011111111100",
+    "0011011101100",
+    "0001100011000",
+    "0011000001100",
+    "0110000000110",
+]
+
+# 3. CONVERTER A MATRIZ EM UMA IMAGEM TRANSPARENTE
+
+def gerar_sprite(desenho, cor):
+    imagem = pygame.Surface((LARGURA_ALIEN, ALTURA_ALIEN), pygame.SRCALPHA)
+    for linha, texto in enumerate(desenho):
+        for coluna, simbolo in enumerate(texto):
+            if simbolo != "0":
+                cor_pixel = VERDE if simbolo == "2" else cor
+                pygame.draw.rect(imagem, cor_pixel, (
+                    coluna * TAMANHO_PIXEL, linha * TAMANHO_PIXEL,
+                    TAMANHO_PIXEL, TAMANHO_PIXEL
+                ))
+    return imagem
+
+# 4. MONTAR A FORMACAO
+
+def criar_frota():
+    largura_frota = COLUNAS * LARGURA_ALIEN + (COLUNAS - 1) * ESPACO_X
+    x_inicial = (LARGURA - largura_frota) // 2
+    inimigos = []
+    for linha in range(LINHAS):
+        for coluna in range(COLUNAS):
+            x = x_inicial + coluna * (LARGURA_ALIEN + ESPACO_X)
+            y = 73 + linha * (ALTURA_ALIEN + ESPACO_Y)
+            inimigos.append(pygame.Rect(x, y, LARGURA_ALIEN, ALTURA_ALIEN))
+    return inimigos
+
+# 5. MOVIMENTO LATERAL + DESCIDA NAS BORDAS
+
+def mover_frota(inimigos, direcao, resto_x, velocidade, dt):
+    if not inimigos:
+        return direcao, resto_x
+    resto_x += direcao * velocidade * dt
+    dx = int(resto_x)
+    resto_x -= dx
+    if dx == 0:
+        return direcao, resto_x
+    esquerda = min(alien.left for alien in inimigos)
+    direita = max(alien.right for alien in inimigos)
+    virou = False
+    if direcao > 0 and direita + dx >= LARGURA - MARGEM:
+        dx = LARGURA - MARGEM - direita
+        virou = True
+    elif direcao < 0 and esquerda + dx <= MARGEM:
+        dx = MARGEM - esquerda
+        virou = True
+    for alien in inimigos:
+        alien.x += dx
+        if virou:
+            alien.y += DESCIDA
+    if virou:
+        direcao *= -1
+        resto_x = 0.0
+    return direcao, resto_x
+
+# 6. DEVOLVER UMA PARTIDA LIMPA AO REINICIAR
+
+def nova_partida():
+    nave = pygame.Rect(380, 425, 40, 40)
+    tiros = []
+    inimigos = criar_frota()
+    pontos, vidas, onda = 0, 3, 1
+    direcao, resto_x = 1, 0.0
+    return nave, tiros, inimigos, pontos, vidas, onda, direcao, resto_x
+
+# 7. SOM (A AULA 33 CARREGA OS ARQUIVOS; A 34 OS REPRODUZ)
+
+def carregar_som(arquivo, volume):
+    if not pygame.mixer.get_init():
+        return None
+    try:
+        som = pygame.mixer.Sound(str(PASTA_SONS / arquivo))
+        som.set_volume(volume)
+        return som
+    except (pygame.error, FileNotFoundError):
+        return None
+def tocar(som):
+    if som is not None:
+        som.play()
+
+# 8. BANCO DE RECORDES (SQLite LOCAL)
+
+def preparar_banco():
+    with sqlite3.connect(ARQUIVO_BANCO) as conexao:
+        conexao.execute("""
+            CREATE TABLE IF NOT EXISTS recordes (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                nome TEXT NOT NULL,
+                pontos INTEGER NOT NULL
+            )
+        """)
+def carregar_ranking():
+    with sqlite3.connect(ARQUIVO_BANCO) as conexao:
+        return conexao.execute("""
+            SELECT nome, pontos FROM recordes
+            ORDER BY pontos DESC, id ASC
+            LIMIT 5
+        """).fetchall()
+
+
+def entrou_no_top5(pontos, ranking):
+    return pontos > 0 and (
+        len(ranking) < 5 or pontos > ranking[-1][1]
+    )
+def salvar_recorde(nome, pontos):
+    with sqlite3.connect(ARQUIVO_BANCO) as conexao:
+        conexao.execute(
+            "INSERT INTO recordes (nome, pontos) VALUES (?, ?)",
+            (nome, pontos)
+        )
+
+# 9. PREPARAR A JANELA E OBJETOS
+tela = pygame.display.set_mode((LARGURA, ALTURA))
+pygame.display.set_caption("SPACESHIPS - aulas cumulativas")
+relogio = pygame.time.Clock()
+fonte = pygame.font.Font(None, 30)
+fonte_grande = pygame.font.Font(None, 55)
+nave, tiros, inimigos, pontos, vidas, onda, direcao, resto_x = nova_partida()
+sprites = [gerar_sprite(DESENHO_1, ROXO), gerar_sprite(DESENHO_2, ROXO)]
+estado = "menu"  # menu, jogando, pausado, registrar, fim
+som_tiro = carregar_som("tiro.wav", 0.25)
+som_acerto = carregar_som("acerto.wav", 0.55)
+som_dano = carregar_som("dano.wav", 0.55)
+som_fim = carregar_som("fim.wav", 0.55)
+musica_pronta = False
+musica_ligada = True
+if pygame.mixer.get_init():
+    try:
+        pygame.mixer.music.load(str(PASTA_SONS / "musica.wav"))
+        pygame.mixer.music.set_volume(0.18)
+        pygame.mixer.music.play(-1)
+        musica_pronta = True
+    except (pygame.error, FileNotFoundError):
+        pass
+banco_ok = True
+ranking = []
+try:
+    preparar_banco()
+    ranking = carregar_ranking()
+except (sqlite3.Error, OSError) as erro:
+    banco_ok = False
+    print("Banco indisponivel:", erro)
+nome_digitado = ""
+aviso = ""
+def escrever_centro(mensagem, y, cor=COR_TEXTO, destaque=False):
+    f = fonte_grande if destaque else fonte
+    imagem = f.render(mensagem, True, cor)
+    tela.blit(imagem, imagem.get_rect(center=(LARGURA // 2, y)))
+def mostrar_ranking(inicio_y):
+    escrever_centro("TOP 5 - RECORDES", inicio_y, COR_TIRO)
+    if not banco_ok:
+        escrever_centro("Banco indisponivel", inicio_y + 30)
+    elif not ranking:
+        escrever_centro("Nenhum recorde registrado", inicio_y + 30)
+    else:
+        for posicao, (nome, valor) in enumerate(ranking, 1):
+            escrever_centro(
+                f"{posicao}. {nome[:16]} - {valor} pontos",
+                inicio_y + posicao * 30
+            )
+# 10. LOOP PRINCIPAL
+rodando = True
+while rodando:
+    dt = min(relogio.tick(FPS) / 1000, 0.05)
+    agora = pygame.time.get_ticks()
+    # EVENTOS: so aqui lemos KEYDOWN
+    for evento in pygame.event.get():
+        if evento.type == pygame.QUIT:
+            rodando = False
+        elif evento.type == pygame.KEYDOWN:
+            if estado == "registrar":
+                if evento.key == pygame.K_BACKSPACE:
+                    nome_digitado = nome_digitado[:-1]
+                    aviso = ""
+                elif evento.key == pygame.K_ESCAPE:
+                    estado = "fim"
+                elif evento.key == pygame.K_RETURN:
+                    nome = nome_digitado.strip()
+                    if not nome:
+                        aviso = "Digite seu nome para confirmar!"
+                    else:
+                        if banco_ok:
+                            try:
+                                salvar_recorde(nome, pontos)
+                                ranking = carregar_ranking()
+                            except (sqlite3.Error, OSError) as erro:
+                                aviso = "Nao foi possivel salvar o recorde"
+                                print(aviso, erro)
+                        estado = "fim"
+                elif evento.unicode and evento.unicode.isprintable():
+                    if len(nome_digitado) < MAX_NOME:
+                        nome_digitado += evento.unicode
+                        aviso = ""
+            else:
+                if evento.key == pygame.K_ESCAPE:
+                    rodando = False
+                elif evento.key == pygame.K_m and musica_pronta:
+                    musica_ligada = not musica_ligada
+                    pygame.mixer.music.set_volume(0.18 if musica_ligada else 0)
+                elif estado == "menu" and evento.key == pygame.K_RETURN:
+                    estado = "jogando"
+                elif estado == "fim" and evento.key == pygame.K_r:
+                    nave, tiros, inimigos, pontos, vidas, onda, direcao, resto_x = nova_partida()
+                    estado = "jogando"
+                    aviso = ""
+                elif evento.key == pygame.K_p:
+                    if estado == "jogando":
+                        estado = "pausado"
+                    elif estado == "pausado":
+                        estado = "jogando"
+                elif estado == "jogando" and evento.key == pygame.K_SPACE:
+                    tiro = pygame.Rect(nave.centerx - 3, nave.top, 6, 16)
+                    tiros.append(tiro)
+                    tocar(som_tiro)
+
+    # ATUALIZAR O JOGO
+    if estado == "jogando":
+        teclas = pygame.key.get_pressed()
+        if teclas[pygame.K_LEFT] or teclas[pygame.K_a]:
+            nave.x -= VELOCIDADE_NAVE
+        if teclas[pygame.K_RIGHT] or teclas[pygame.K_d]:
+            nave.x += VELOCIDADE_NAVE
+        nave.x = max(0, min(nave.x, LARGURA - nave.width))
+        for tiro in tiros[:]:
+            tiro.y -= 9
+            if tiro.bottom < 0:
+                tiros.remove(tiro)
+        velocidade = min(240, 100 + 20 * (onda - 1))
+        direcao, resto_x = mover_frota(
+            inimigos, direcao, resto_x, velocidade, dt
+        )
+        # Percorrer copias impede pular objetos removidos.
+        for tiro in tiros[:]:
+            for alien in inimigos[:]:
+                if tiro.colliderect(alien):
+                    inimigos.remove(alien)
+                    tiros.remove(tiro)
+                    pontos += 10
+                    tocar(som_acerto)
+                    break
+        # Cada onda vencida concede bonus e uma nova formacao.
+        if not inimigos:
+            onda += 1
+            pontos += 50
+            inimigos = criar_frota()
+            tiros.clear()
+            direcao, resto_x = 1, 0.0
+        elif any(alien.bottom >= nave.top for alien in inimigos):
+            vidas = max(0, vidas - 1)
+            tocar(som_dano)
+            tiros.clear()
+            inimigos = criar_frota()
+            direcao, resto_x = 1, 0.0
+            if vidas == 0:
+                tocar(som_fim)
+                if banco_ok and entrou_no_top5(pontos, ranking):
+                    estado = "registrar"
+                    nome_digitado = ""
+                    aviso = ""
+                else:
+                    estado = "fim"
+
+    # DESENHAR: limpar a tela antes de redesenhar os objetos
+    tela.fill(COR_FUNDO)
+    if estado == "menu":
+        escrever_centro("SPACESHIPS", 85, COR_NAVE, destaque=True)
+        escrever_centro("ENTER - iniciar partida", 165, COR_TIRO)
+        escrever_centro("A/D ou setas: mover | ESPACO: tiro", 208)
+        escrever_centro("P: pausa | R: reiniciar no fim", 242)
+        escrever_centro("M: musica | ESC: sair", 276)
+        mostrar_ranking(315)
+    else:
+        pygame.draw.polygon(tela, COR_NAVE, [
+            (nave.centerx, nave.top),
+            (nave.left, nave.bottom),
+            (nave.right, nave.bottom)
+        ])
+        animacao = (agora // 300) % 2
+        for alien in inimigos:
+            tela.blit(sprites[animacao], alien.topleft)
+        for tiro in tiros:
+            pygame.draw.rect(tela, COR_TIRO, tiro)
+        placar = f"Pontos: {pontos}   Vidas: {vidas}   Onda: {onda}"
+        texto_placar = fonte.render(placar, True, COR_TEXTO)
+        tela.blit(texto_placar, (17, 15))
+        if estado == "pausado":
+            escrever_centro("PAUSADO - P para voltar", 255, COR_TIRO)
+        elif estado == "fim":
+            escrever_centro("FIM DE JOGO", 240, COR_TIRO, destaque=True)
+            escrever_centro("Pressione R para reiniciar", 290)
+            mostrar_ranking(330)
+            if aviso:
+                escrever_centro(aviso, 460, COR_TIRO)
+        elif estado == "registrar":
+            escrever_centro("VOCE ENTROU NO TOP 5!", 212, COR_TIRO)
+            escrever_centro("Digite seu nome e tecle ENTER", 255)
+            cursor = "|" if (agora // 500) % 2 == 0 else ""
+            escrever_centro(nome_digitado + cursor, 305, COR_NAVE)
+            escrever_centro("BACKSPACE apaga; ESC cancela", 358)
+            if aviso:
+                escrever_centro(aviso, 410, COR_TIRO)
+    pygame.display.flip()
+pygame.quit()
